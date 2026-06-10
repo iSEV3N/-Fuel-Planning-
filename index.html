@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fuel Planning & Special Procedures — Dispatcher Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0f18; --bg2:#0d1421; --surface:#121c2b; --surface2:#16223400; --line:#1f2d40;
+    --line2:#26384f; --ink:#e6edf6; --muted:#93a4ba; --faint:#62748d;
+    --cyan:#38bdf8; --amber:#fbbf24; --orange:#fb923c; --green:#34d399;
+    --red:#f87171; --violet:#a78bfa; --slate:#64748b;
+    --display:'Sora',sans-serif; --body:'IBM Plex Sans Thai',sans-serif; --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{
+    margin:0;background:
+      radial-gradient(1200px 600px at 80% -10%, #102236 0%, transparent 60%),
+      var(--bg);
+    color:var(--ink);font-family:var(--body);line-height:1.7;font-size:16px;
+    -webkit-font-smoothing:antialiased;
+    -webkit-text-size-adjust:100%;text-size-adjust:100%;
+  }
+  a{color:var(--cyan);text-decoration:none}
+
+  /* ---------- header / nav ---------- */
+  header.top{
+    position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+    background:rgba(10,15,24,.82);border-bottom:1px solid var(--line);
+  }
+  .top-inner{max-width:1080px;margin:0 auto;padding:14px 22px}
+  .brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .tag{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--amber);border:1px solid var(--line2);padding:3px 9px;border-radius:4px}
+  .brand h1{font-family:var(--display);font-weight:700;font-size:clamp(17px,2.4vw,21px);
+    margin:0;letter-spacing:-.01em}
+  nav.chips{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:2px;
+    scrollbar-width:thin}
+  nav.chips a{font-family:var(--mono);font-size:12px;white-space:nowrap;color:var(--muted);
+    border:1px solid var(--line);padding:6px 12px;border-radius:20px;transition:.15s}
+  nav.chips a:hover{color:var(--ink);border-color:var(--cyan)}
+  nav.chips a.active{color:var(--bg);background:var(--cyan);border-color:var(--cyan);font-weight:600}
+
+  /* ---------- layout ---------- */
+  main{max-width:1080px;margin:0 auto;padding:0 22px 90px}
+  section{padding-top:56px;margin-top:8px;border-top:1px solid transparent}
+  section.lead{padding-top:46px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--cyan);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .eyebrow .num{color:var(--amber);font-weight:600}
+  h2{font-family:var(--display);font-weight:700;font-size:clamp(24px,4vw,34px);margin:.1em 0 .35em;
+    letter-spacing:-.02em;line-height:1.15}
+  h3{font-family:var(--display);font-weight:600;font-size:19px;margin:34px 0 6px;color:#f1f6fc}
+  h4{font-family:var(--body);font-weight:600;font-size:16px;margin:20px 0 4px;color:var(--cyan)}
+  p{margin:.5em 0;color:#d4deea}
+  .muted{color:var(--muted)}
+  strong{color:#fff;font-weight:600}
+  code,.k{font-family:var(--mono);font-size:.92em;background:#0e1a29;border:1px solid var(--line);
+    padding:1px 6px;border-radius:4px;color:var(--amber)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:54px 0 8px}
+  .hero h2{font-size:clamp(30px,6vw,52px);max-width:18ch}
+  .hero .sub{font-size:clamp(16px,2.4vw,19px);color:var(--muted);max-width:60ch;margin-top:14px}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+  .pill{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line2);
+    border-radius:6px;padding:7px 12px;background:var(--surface)}
+  .pill b{color:var(--ink);font-weight:600}
+
+  /* ---------- cards / callouts ---------- */
+  .card{background:linear-gradient(180deg,var(--surface),#0f1826);border:1px solid var(--line);
+    border-radius:14px;padding:22px 24px;margin:22px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  .note{border-left:3px solid var(--cyan);background:#0e1a2980;border-radius:0 10px 10px 0;
+    padding:12px 18px;margin:18px 0}
+  .note.warn{border-color:var(--amber)}
+  .note.danger{border-color:var(--red)}
+  .note .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--cyan);display:block;margin-bottom:3px}
+  .note.warn .lbl{color:var(--amber)} .note.danger .lbl{color:var(--red)}
+
+  ul.clean{list-style:none;padding-left:0;margin:.4em 0}
+  ul.clean li{position:relative;padding-left:22px;margin:7px 0}
+  ul.clean li::before{content:"›";position:absolute;left:4px;top:-1px;color:var(--cyan);font-weight:700}
+
+  /* ---------- figure ---------- */
+  figure{margin:24px 0;background:#0b1320;border:1px solid var(--line);border-radius:14px;
+    padding:18px 18px 12px;overflow:hidden}
+  .fig-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  figure svg{display:block;width:100%;height:auto}
+  figcaption{font-family:var(--mono);font-size:12px;color:var(--faint);margin-top:10px;
+    text-align:center;letter-spacing:.02em;line-height:1.5}
+
+  /* ---------- legend ---------- */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 2px;font-family:var(--mono);font-size:12px}
+  .legend span{display:inline-flex;align-items:center;gap:7px;color:var(--muted)}
+  .sw{width:13px;height:13px;border-radius:3px;display:inline-block}
+
+  /* ---------- table ---------- */
+  .tbl{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px;overflow:hidden;
+    border-radius:10px;border:1px solid var(--line)}
+  .tbl th,.tbl td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  .tbl th{background:#0e1a29;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--cyan);font-weight:600}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl td.mono{font-family:var(--mono);color:var(--amber)}
+  .scroll-x{overflow-x:auto}
+
+  /* ---------- formula ---------- */
+  .formula{font-family:var(--mono);font-size:13.5px;background:#0b1422;border:1px solid var(--line2);
+    border-radius:10px;padding:16px 18px;margin:14px 0;line-height:1.9;color:#cde3f5}
+  .formula .plus{color:var(--faint)} .formula .res{color:var(--green)}
+  .formula .hl{color:var(--amber)}
+
+  /* ---------- self-check ---------- */
+  details.q{border:1px solid var(--line);border-radius:10px;margin:12px 0;background:var(--surface);
+    overflow:hidden}
+  details.q summary{cursor:pointer;padding:14px 18px;font-weight:600;color:#eaf1f9;list-style:none;
+    display:flex;gap:12px;align-items:flex-start}
+  details.q summary::-webkit-details-marker{display:none}
+  details.q summary .qn{font-family:var(--mono);color:var(--amber);flex:none}
+  details.q summary::after{content:"+";margin-left:auto;color:var(--cyan);font-family:var(--mono);
+    font-size:20px;line-height:1}
+  details.q[open] summary::after{content:"−"}
+  details.q .ans{padding:0 18px 16px 18px;color:var(--muted);border-top:1px solid var(--line)}
+  details.q .ans p:first-child{margin-top:12px}
+
+  footer{max-width:1080px;margin:0 auto;padding:30px 22px 60px;border-top:1px solid var(--line);
+    color:var(--faint);font-size:13px}
+  footer .mono{font-family:var(--mono)}
+
+  ::selection{background:var(--cyan);color:var(--bg)}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:4px}
+
+  /* anchor offset so sticky header doesn't cover section titles */
+  section{scroll-margin-top:96px}
+  .formula .rule{display:block;border-top:1px solid var(--line2);margin:8px 0}
+  .scroll-x .tbl{min-width:480px}
+
+  /* ---------- TABLET (≤ 1024px) ---------- */
+  @media(max-width:1024px){
+    main{padding:0 20px 80px}
+    .hero{padding:44px 0 6px}
+  }
+
+  /* ---------- MOBILE (≤ 640px) ---------- */
+  @media(max-width:640px){
+    body{font-size:15.5px;line-height:1.65}
+    .top-inner{padding:11px 14px}
+    .brand h1{font-size:16px}
+    .tag{font-size:10px;padding:2px 7px}
+    nav.chips{margin-top:10px;gap:5px}
+    nav.chips a{font-size:11.5px;padding:5px 10px}
+    main{padding:0 14px 64px}
+    section{padding-top:42px;scroll-margin-top:104px}
+    section.lead{padding-top:30px}
+    .hero{padding:30px 0 4px}
+    h3{font-size:17px;margin-top:26px}
+    .card{padding:16px 15px;border-radius:12px}
+    .note{padding:11px 14px}
+    .formula{font-size:12px;padding:13px 13px;overflow-x:auto}
+    /* keep diagram text legible: let figures pan horizontally instead of shrinking */
+    figure{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 10px}
+    figure svg{min-width:600px}
+    figcaption{font-size:11px;text-align:left}
+    .tbl th,.tbl td{padding:9px 11px;font-size:13.5px}
+    .legend{font-size:11px;gap:7px 12px}
+    details.q summary{padding:12px 14px;font-size:14.5px}
+    details.q .ans{padding:0 14px 14px}
+    .hero-meta{gap:8px}
+    .pill{font-size:11px;padding:6px 10px}
+  }
+
+  /* ---------- SMALL MOBILE (≤ 380px) ---------- */
+  @media(max-width:380px){
+    figure svg{min-width:520px}
+    .formula{font-size:11.5px}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <span class="tag">Dispatch Reference</span>
+      <h1>Fuel Planning &amp; Special Procedures</h1>
+    </div>
+    <nav class="chips" id="nav">
+      <a href="#intro">ภาพรวม Fuel</a>
+      <a href="#contingency">Contingency 5% / 3%</a>
+      <a href="#reclear">Re-clearance</a>
+      <a href="#etops">ETOPS / EDTO</a>
+      <a href="#noalt">Without Alternate</a>
+      <a href="#examples">Worked Examples</a>
+      <a href="#inflight">In-flight Fuel</a>
+      <a href="#summary">สรุป</a>
+      <a href="#check">ทบทวน</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero lead" id="intro">
+    <h2>เชื้อเพลิงที่บรรทุก คือ การจัดการความไม่แน่นอน</h2>
+    <p class="sub">เอกสารทบทวนสำหรับ Flight Dispatcher ว่าด้วย Contingency Fuel (R/R 5% &amp; 3%),
+      Re-clearance / Re-dispatch, ETOPS / EDTO และการวางแผนเมื่อไม่มี Destination Alternate
+      อ้างอิงตาม ICAO Annex 6 และ Flight Dispatcher Manual / OM-A ของผู้ดำเนินการ</p>
+    <div class="hero-meta">
+      <span class="pill">อ้างอิง <b>FDM Sec. 3.9 / 4.5</b></span>
+      <span class="pill">อ้างอิง <b>OM-A Sec. 8</b></span>
+      <span class="pill">มาตรฐาน <b>ICAO Annex 6</b></span>
+      <span class="pill">ฝูงบินอ้างอิง <b>B737 / B767</b></span>
+    </div>
+
+    <div class="card" style="border-color:var(--line2)">
+      <h4>วัตถุประสงค์การเรียนรู้ (Learning Objectives)</h4>
+      <p class="muted">เมื่อจบบทนี้ ผู้เรียนสามารถ:</p>
+      <ul class="clean">
+        <li>สร้าง standard fuel และอธิบายแต่ละก้อน รวมถึงความสัมพันธ์ Ramp / Block / Take-off</li>
+        <li>คำนวณ Contingency ด้วยหลัก "เลือกค่าสูงสุดในสามทาง" และใช้ 3% เมื่อมี ERA</li>
+        <li>วางแผน Re-clearance และทำการตรวจสอบเชื้อเพลิง ณ POR ได้</li>
+        <li>อธิบาย EDTO threshold / maximum diversion time และ critical fuel scenario</li>
+        <li>ใช้เกณฑ์ no-alternate, two-alternate และ isolated aerodrome ได้ถูกต้อง</li>
+        <li>จัดการเชื้อเพลิงระหว่างบิน และแยกการแจ้ง MINIMUM FUEL ออกจาก MAYDAY FUEL</li>
+      </ul>
+    </div>
+
+    <div class="note" style="margin-top:18px">
+      <span class="lbl">การใช้งาน</span>
+      เปิดได้ทั้งมือถือ แท็บเล็ต และคอมพิวเตอร์ — บนจอเล็ก <strong>แผนภาพและตารางสามารถเลื่อนแนวนอน</strong> เพื่อดูเต็มขนาดได้
+    </div>
+
+    <h3>โครงสร้างเชื้อเพลิงพื้นฐาน (Standard Fuel Planning)</h3>
+    <p>ก่อนเข้าสู่ขั้นตอนพิเศษ ต้องเห็นภาพ "ก้อนเชื้อเพลิง" แต่ละก้อนก่อน เพราะทุกหัวข้อหลังจากนี้
+      คือการ <em>ปรับ</em> ก้อนใดก้อนหนึ่งของภาพนี้ ตาม FDM Section 3.9.2 เชื้อเพลิงขั้นต่ำที่ต้องมีก่อนออกเดินทาง
+      ประกอบด้วย Taxi + Trip + Contingency + Alternate + Final Reserve และ Additional / Extra เมื่อจำเป็น</p>
+
+    <div class="legend">
+      <span><i class="sw" style="background:var(--slate)"></i>Taxi</span>
+      <span><i class="sw" style="background:var(--cyan)"></i>Trip</span>
+      <span><i class="sw" style="background:var(--amber)"></i>Contingency</span>
+      <span><i class="sw" style="background:var(--orange)"></i>Alternate</span>
+      <span><i class="sw" style="background:var(--green)"></i>Final Reserve</span>
+      <span><i class="sw" style="background:var(--violet)"></i>Additional / Extra</span>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 760 360" role="img" aria-label="แผนภาพโปรไฟล์เชื้อเพลิงมาตรฐาน">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0e2238"/><stop offset="1" stop-color="#0b1320"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="760" height="360" fill="url(#sky)"/>
+        <!-- ground -->
+        <line x1="40" y1="300" x2="720" y2="300" stroke="#26384f" stroke-width="1.5"/>
+        <!-- airfields -->
+        <g font-family="IBM Plex Mono" font-size="12" fill="#93a4ba" text-anchor="middle">
+          <rect x="78" y="296" width="56" height="8" fill="#33485f"/><text x="106" y="322">DEPARTURE</text>
+          <rect x="412" y="296" width="56" height="8" fill="#33485f"/><text x="440" y="322">DESTINATION</text>
+          <rect x="608" y="296" width="56" height="8" fill="#33485f"/><text x="636" y="322">ALTERNATE</text>
+        </g>
+        <!-- trip profile -->
+        <path d="M106 300 L150 300 L210 150 L380 150 L440 300" fill="none" stroke="#38bdf8" stroke-width="3"/>
+        <text x="295" y="138" fill="#38bdf8" font-family="Sora" font-size="14" font-weight="600" text-anchor="middle">TRIP FUEL</text>
+        <!-- taxi -->
+        <path d="M106 300 L150 300" stroke="#64748b" stroke-width="6" stroke-dasharray="2 4"/>
+        <text x="128" y="290" fill="#64748b" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">taxi</text>
+        <!-- contingency marker over destination -->
+        <g>
+          <rect x="396" y="150" width="88" height="20" rx="4" fill="#fbbf2422" stroke="#fbbf24" stroke-width="1"/>
+          <text x="440" y="164" fill="#fbbf24" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">+ CONTINGENCY</text>
+        </g>
+        <!-- alternate -->
+        <path d="M440 300 L500 196 L572 196 L636 300" fill="none" stroke="#fb923c" stroke-width="3"/>
+        <text x="536" y="184" fill="#fb923c" font-family="Sora" font-size="13" font-weight="600" text-anchor="middle">ALTERNATE FUEL</text>
+        <!-- final reserve -->
+        <g>
+          <path d="M636 250 L636 300" stroke="#34d399" stroke-width="3"/>
+          <circle cx="636" cy="245" r="16" fill="none" stroke="#34d399" stroke-width="2" stroke-dasharray="3 3"/>
+          <text x="636" y="226" fill="#34d399" font-family="IBM Plex Mono" font-size="10" text-anchor="middle">30 min</text>
+          <text x="700" y="252" fill="#34d399" font-family="Sora" font-size="12" font-weight="600" text-anchor="end">FINAL RESERVE</text>
+        </g>
+      </svg>
+      <figcaption>Fig. 0 — โปรไฟล์เชื้อเพลิงมาตรฐาน: Trip ถึง Destination, Alternate ต่อไปยังสนามบินสำรอง, Final Reserve เป็น holding 30 นาทีเหนือสนามบินที่ตั้งใจลงจริง</figcaption>
+    </figure>
+
+    <div class="grid2">
+      <div class="card">
+        <h4>Final Reserve Fuel (FDM 3.9.2.5)</h4>
+        <p class="muted">เชื้อเพลิงสำหรับ holding 30 นาที ที่ 1,500 ft เหนือสนามบิน (alternate หรือ destination
+          เมื่อไม่ต้องมี alternate) คิดที่น้ำหนักประมาณการเมื่อถึงปลายทาง เป็นค่าที่ <strong>ห้ามแตะ</strong> ในการวางแผน</p>
+      </div>
+      <div class="card">
+        <h4>Additional / Extra Fuel</h4>
+        <p class="muted"><strong>Additional</strong> = เผื่อกรณี engine failure / loss of pressurization ที่จุดวิกฤต
+          (FDM 3.9.2.6). <strong>Extra</strong> = ดุลยพินิจ PIC เผื่อ delay, MEL/CDL, tankering — เพิ่มได้แต่ลดขั้นต่ำไม่ได้</p>
+      </div>
+    </div>
+
+    <h3>RAMP / BLOCK / TAKE-OFF Fuel — อย่าสับสน</h3>
+    <p>สามคำนี้คือ "เชื้อเพลิงก้อนเดียวกัน" มองคนละจุดเวลา:</p>
+    <ul class="clean">
+      <li><strong>Ramp Fuel</strong> = เชื้อเพลิงทั้งหมดบนเครื่องก่อนติดเครื่องยนต์ (การสั่งเติมอ้างอิงค่านี้)</li>
+      <li><strong>Take-off Fuel</strong> = Ramp − Taxi</li>
+      <li><strong>Block Fuel</strong> = Taxi + Trip + Reserve (Contingency + Alternate + Final Reserve) + Additional / Extra</li>
+    </ul>
+
+    <h3>ค่ามาตรฐานอ้างอิงของฝูงบิน</h3>
+    <div class="scroll-x">
+      <table class="tbl">
+        <thead><tr><th>Type</th><th>Taxi (10 min)</th><th>Final Reserve (30 min)</th><th>Final Approach</th></tr></thead>
+        <tbody>
+          <tr><td>B737-400</td><td class="mono">200 kg</td><td class="mono">1,300 kg</td><td class="mono">200 kg</td></tr>
+          <tr><td>B737-800</td><td class="mono">200 kg</td><td class="mono">1,200 kg</td><td class="mono">200 kg</td></tr>
+          <tr><td>B767-300</td><td class="mono">300 kg</td><td class="mono">1,700 kg</td><td class="mono">300 kg</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">ค่า Final Reserve เป็น quick-reference ต่อ type ตามแนวทาง ICAO Annex 6 ไม่ใช่ค่าทดแทนการคำนวณจริงต่อเที่ยว
+      ส่วน holding fuel flow สำหรับ contingency 5-min ขึ้นกับน้ำหนัก/ระดับ ให้อ่านจาก FCOM/FPPM</p>
+  </section>
+
+  <!-- 1. CONTINGENCY -->
+  <section id="contingency">
+    <div class="eyebrow"><span class="num">01</span> Contingency Fuel</div>
+    <h2>R/R 5% และ 3% — เลือกค่าที่มากที่สุด</h2>
+    <p>Contingency Fuel (บางที่เรียก Route Reserve / R/R หรือ En-route Reserve) มีไว้ชดเชยปัจจัยที่คาดการณ์ไม่ได้
+      สามอย่างหลักตาม FDM 3.9.2.3 คือ การเบี่ยงเบนของอัตราสิ้นเปลืองจริงของเครื่องแต่ละลำ, สภาพอากาศจริงต่างจาก forecast,
+      และการเปลี่ยน routing หรือ cruising level จากที่วางแผน</p>
+
+    <p>หัวใจคือ <strong>ไม่ใช่เลือกอย่างใดอย่างหนึ่ง</strong> แต่คำนวณทั้งสามทางแล้วเลือก <strong>ค่าที่มากที่สุด</strong>:</p>
+
+    <figure>
+      <svg viewBox="0 0 760 280" role="img" aria-label="ตรรกะการเลือก contingency fuel">
+        <rect x="0" y="0" width="760" height="280" fill="#0b1320"/>
+        <g font-family="Sora" font-weight="600">
+          <!-- option A -->
+          <rect x="30" y="40" width="200" height="92" rx="10" fill="#13202f" stroke="#fbbf24" stroke-width="1.4"/>
+          <text x="130" y="68" fill="#fbbf24" font-size="15" text-anchor="middle">5%</text>
+          <text x="130" y="92" fill="#cdd9e6" font-size="12" font-family="IBM Plex Sans Thai" text-anchor="middle">ของ planned</text>
+          <text x="130" y="110" fill="#cdd9e6" font-size="12" font-family="IBM Plex Sans Thai" text-anchor="middle">trip fuel</text>
+          <!-- option B -->
+          <rect x="280" y="40" width="200" height="92" rx="10" fill="#13202f" stroke="#34d399" stroke-width="1.4"/>
+          <text x="380" y="68" fill="#34d399" font-size="15" text-anchor="middle">3%</text>
+          <text x="380" y="92" fill="#cdd9e6" font-size="12" font-family="IBM Plex Sans Thai" text-anchor="middle">ของ trip fuel</text>
+          <text x="380" y="110" fill="#7ee0bd" font-size="11" font-family="IBM Plex Mono" text-anchor="middle">ถ้ามี ERA</text>
+          <!-- option C -->
+          <rect x="530" y="40" width="200" height="92" rx="10" fill="#13202f" stroke="#38bdf8" stroke-width="1.4"/>
+          <text x="630" y="66" fill="#38bdf8" font-size="14" text-anchor="middle">5 min HOLD</text>
+          <text x="630" y="90" fill="#cdd9e6" font-size="12" font-family="IBM Plex Sans Thai" text-anchor="middle">ที่ 1,500 ft</text>
+          <text x="630" y="108" fill="#cdd9e6" font-size="11" font-family="IBM Plex Sans Thai" text-anchor="middle">เหนือ destination</text>
+          <!-- arrows to selector -->
+          <path d="M130 132 L130 168 L380 168" fill="none" stroke="#33485f" stroke-width="1.5"/>
+          <path d="M380 132 L380 168" fill="none" stroke="#33485f" stroke-width="1.5"/>
+          <path d="M630 132 L630 168 L380 168" fill="none" stroke="#33485f" stroke-width="1.5"/>
+          <!-- selector -->
+          <rect x="250" y="184" width="260" height="58" rx="12" fill="#1a2740" stroke="#38bdf8" stroke-width="1.6"/>
+          <text x="380" y="210" fill="#fff" font-size="15" text-anchor="middle">เลือกค่าที่ "มากที่สุด"</text>
+          <text x="380" y="231" fill="#93a4ba" font-size="11" font-family="IBM Plex Mono" text-anchor="middle">= CONTINGENCY FUEL</text>
+        </g>
+      </svg>
+      <figcaption>Fig. 1 — ตรรกะ Contingency: คำนวณทั้งสามทาง แล้วเลือกค่าสูงสุด (ERA = En-route Alternate)</figcaption>
+    </figure>
+
+    <h3>เงื่อนไขสำคัญของการลดเหลือ 3%</h3>
+    <p>การใช้ 3% แทน 5% <strong>ไม่ได้ทำโดยอัตโนมัติ</strong> ต้องมี <strong>En-route Alternate (ERA) ที่ใช้ได้จริง</strong>
+      ตามเส้นทางจึงจะมีสิทธิ์ลด และต้องไม่ต่ำกว่า minimum contingency ที่ผู้ดำเนินการกำหนด
+      ในทางปฏิบัติ PIC สามารถปรับมาใช้ 3% CF แทน 5% ที่วางแผนไว้ได้เมื่อมั่นใจว่า ERA พร้อม</p>
+
+    <div class="note">
+      <span class="lbl">In-flight Re-planning</span>
+      เมื่อมีการ re-planning ระหว่างบิน Contingency คิดจาก <strong>trip fuel ของช่วงที่เหลือ</strong> (remainder of the flight)
+      ไม่ใช่ทั้งเส้นทาง — แนวคิดนี้คือพื้นฐานของ Re-clearance ในหัวข้อถัดไป
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">จุดที่มักเข้าใจผิด</span>
+      "5 นาที holding ที่ 1,500 ft" คิดที่ <strong>holding speed ใน standard conditions เหนือ destination</strong>
+      ไม่ใช่ "5 นาทีของ fuel flow ใด ๆ" และตัวเลือก 3% มีอยู่จริงเสมอเมื่อมี ERA — ภาพอธิบายที่ละ option นี้ทิ้งจะไม่ครบ
+    </div>
+  </section>
+
+  <!-- 2. RE-CLEARANCE -->
+  <section id="reclear">
+    <div class="eyebrow"><span class="num">02</span> Re-clearance / Re-dispatch</div>
+    <h2>ประหยัดเชื้อเพลิงด้วยการเลื่อนจุดคิด Contingency</h2>
+    <p>Re-clearance (FDM เรียก <em>Planning with a Secondary Destination via Point of Re-dispatch — POR</em>, Sec. 4.5.3.1)
+      ใช้เมื่อการวางแผนตรงไปยังปลายทางที่ตั้งใจ (Final Destination) ทำไม่ได้เพราะข้อจำกัด range / payload / wind
+      โดยมีโอกาสตามสมควรที่จะบินต่อไปยัง Final Destination ได้จาก POR</p>
+
+    <p><strong>กลไกที่ทำให้ประหยัด:</strong> แทนที่จะคิด Contingency บนทั้งเส้นทาง (DEP→Final)
+      เราคิด Contingency เฉพาะช่วง <strong>POR→Final</strong> เท่านั้น ทำให้ Contingency เล็กลง → บรรทุก payload ได้มากขึ้น</p>
+
+    <div class="legend">
+      <span><i class="sw" style="background:var(--cyan)"></i>Trip A→POR→Final</span>
+      <span><i class="sw" style="background:var(--amber)"></i>Contingency (เฉพาะ POR→Final)</span>
+      <span><i class="sw" style="background:var(--red)"></i>Fallback → Initial Destination</span>
+      <span><i class="sw" style="background:var(--orange)"></i>Destination Alternate</span>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 760 330" role="img" aria-label="แผนภาพ re-clearance">
+        <rect x="0" y="0" width="760" height="330" fill="#0b1320"/>
+        <line x1="40" y1="250" x2="720" y2="250" stroke="#26384f" stroke-width="1.4"/>
+        <!-- nodes -->
+        <g font-family="IBM Plex Mono" font-size="11" fill="#93a4ba" text-anchor="middle">
+          <circle cx="90" cy="250" r="6" fill="#38bdf8"/><text x="90" y="274">DEP [A]</text>
+          <circle cx="380" cy="250" r="7" fill="#fbbf24"/><text x="380" y="274">POR</text>
+          <text x="380" y="288" fill="#62748d" font-size="10">จุดตัดสินใจ</text>
+          <circle cx="660" cy="250" r="6" fill="#38bdf8"/><text x="660" y="274">FINAL DEST [B]</text>
+          <circle cx="250" cy="120" r="6" fill="#f87171"/><text x="250" y="106">INITIAL DEST</text>
+          <text x="250" y="92" fill="#62748d" font-size="10">(secondary, ใกล้กว่า)</text>
+          <circle cx="660" cy="150" r="6" fill="#fb923c"/><text x="660" y="136">DEST ALTN</text>
+        </g>
+        <!-- planned trip -->
+        <path d="M90 250 L380 250" stroke="#38bdf8" stroke-width="3"/>
+        <path d="M380 250 L660 250" stroke="#38bdf8" stroke-width="3"/>
+        <!-- contingency segment highlight -->
+        <rect x="380" y="232" width="280" height="7" fill="#fbbf24"/>
+        <text x="520" y="224" fill="#fbbf24" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">Contingency คิดเฉพาะช่วงนี้</text>
+        <!-- fallback to initial -->
+        <path d="M380 250 L250 126" stroke="#f87171" stroke-width="2.2" stroke-dasharray="6 5"/>
+        <text x="300" y="200" fill="#f87171" font-family="IBM Plex Sans Thai" font-size="11" text-anchor="middle">ถ้า fuel ไม่พอ</text>
+        <!-- dest alternate -->
+        <path d="M660 250 L660 156" stroke="#fb923c" stroke-width="2.2"/>
+        <!-- decision label -->
+        <g>
+          <rect x="300" y="14" width="380" height="56" rx="10" fill="#101b2c" stroke="#26384f"/>
+          <text x="318" y="36" fill="#cdd9e6" font-family="IBM Plex Sans Thai" font-size="12">ณ POR: ถ้า <tspan fill="#34d399">fuel overhead ≥ required-to-Final</tspan></text>
+          <text x="318" y="56" fill="#cdd9e6" font-family="IBM Plex Sans Thai" font-size="12">→ <tspan fill="#38bdf8">re-clear ไป Final [B]</tspan> ; มิฉะนั้น → <tspan fill="#f87171">divert Initial Dest</tspan></text>
+        </g>
+      </svg>
+      <figcaption>Fig. 2 — Re-clearance: บรรทุกพอไปถึง Initial Destination (พร้อม reserve เต็ม) แต่คิด Contingency เฉพาะ POR→Final จึงประหยัด</figcaption>
+    </figure>
+
+    <h3>เกณฑ์เชื้อเพลิง (FDM 4.5.3.1)</h3>
+    <ul class="clean">
+      <li>Trip fuel = (DEP → POR) + (POR → Final Destination)</li>
+      <li>Contingency ลดเหลือ <strong>5% ของ fuel burn ช่วง POR → Final</strong> แต่ไม่ต่ำกว่า minimum contingency ของผู้ดำเนินการ</li>
+      <li>เชื้อเพลิงรวมสำหรับช่วง (DEP → POR) ต้อง <strong>ไม่น้อยกว่า</strong> เชื้อเพลิงที่ต้องใช้บินไปยัง alternate destination (secondary) ตาม Standard Fuel Planning</li>
+      <li>ATS Flight Plan ยื่นไปยัง <strong>intended (Final) destination</strong> เสมอ และระบุ <span class="k">RIF/…</span> ไปยัง secondary ใน Item 18</li>
+      <li>ขอ re-clearance เฉพาะเมื่อจำเป็นต้อง divert ไป secondary เท่านั้น และพิลอตต้องได้ OFP ทั้งสองชุด + แผน replanning จาก POR</li>
+    </ul>
+
+    <h3>การตรวจสอบ ณ POR</h3>
+    <p class="muted">"Required fuel for re-planning to the destination" คือผลรวมของช่วงที่เหลือ ใช้เทียบกับ fuel overhead the POR:</p>
+    <div class="formula">
+      Required-to-Final =<br>
+      &nbsp;&nbsp;Trip fuel <span class="muted">(POR → Final)</span><br>
+      <span class="plus">+</span> <span class="hl">5% Contingency</span> <span class="muted">(POR → Final)</span><br>
+      <span class="plus">+</span> Alternate fuel <span class="muted">(Final destination alternate)</span><br>
+      <span class="plus">+</span> Final Reserve fuel<br>
+      <span class="res">⇒ ถ้า Fuel overhead POR ≥ ค่านี้ : proceed to Final ; มิฉะนั้น divert Initial Dest</span>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">Term ที่ต้องไม่สับสน</span>
+      Fallback เมื่อ re-clear ไม่ได้ คือ <strong>Initial Destination</strong> (สนามบินที่ใกล้กว่าซึ่งเติม fuel เต็มไปถึง)
+      ซึ่งเป็นคนละตัวกับ <strong>Destination Alternate</strong> ของ Final Destination — ยกเว้นเข้าเกณฑ์ replanning without alternate ครบ
+    </div>
+  </section>
+
+  <!-- 3. ETOPS -->
+  <section id="etops">
+    <div class="eyebrow"><span class="num">03</span> ETOPS / EDTO</div>
+    <h2>เมื่อสนามบินที่ใกล้ที่สุดยังอยู่ไกลเกิน Threshold</h2>
+    <p>ICAO ปัจจุบันใช้คำว่า <strong>EDTO — Extended Diversion Time Operations</strong>: การปฏิบัติการของเครื่องบินที่มี
+      turbine engine ตั้งแต่ 2 เครื่องขึ้นไป ซึ่ง diversion time ไป en-route alternate <strong>เกิน threshold</strong> ที่ Authority กำหนด
+      ส่วน <strong>ETOPS</strong> เป็นคำเดิมที่ใช้เฉพาะบริบทเครื่องยนต์คู่ (twin)</p>
+
+    <p>แนวคิดเชิงพื้นที่: รอบแต่ละสนามบินที่ใช้เป็น en-route alternate มีวงรัศมี <span class="k">R</span> =
+      ระยะที่บินได้ภายในเวลาที่อนุมัติ ที่ <strong>One-Engine-Inoperative (OEI) cruising speed</strong> ใน still air
+      ถ้าทั้งเส้นทางอยู่ในวงเหล่านี้ ก็ไม่ต้องอ้อม — เครื่องยนต์คู่จึงบินข้ามมหาสมุทรได้</p>
+
+    <figure>
+      <svg viewBox="0 0 760 330" role="img" aria-label="แผนภาพ ETOPS rings">
+        <rect x="0" y="0" width="760" height="330" fill="#0b1320"/>
+        <!-- rings -->
+        <g fill="none" stroke="#7c5cff" stroke-width="1.4" opacity=".55">
+          <circle cx="120" cy="200" r="90"/>
+          <circle cx="380" cy="120" r="90"/>
+          <circle cx="640" cy="200" r="90"/>
+        </g>
+        <!-- R labels -->
+        <g font-family="IBM Plex Mono" font-size="13" fill="#a78bfa">
+          <line x1="120" y1="200" x2="120" y2="118" stroke="#a78bfa" stroke-width="1"/><text x="128" y="158">R</text>
+          <line x1="380" y1="120" x2="380" y2="38" stroke="#a78bfa" stroke-width="1"/><text x="388" y="80">R</text>
+          <line x1="640" y1="200" x2="640" y2="118" stroke="#a78bfa" stroke-width="1"/><text x="648" y="158">R</text>
+        </g>
+        <!-- airports -->
+        <g font-family="IBM Plex Mono" font-size="11" text-anchor="middle">
+          <circle cx="120" cy="200" r="6" fill="#fbbf24"/><text x="120" y="224" fill="#93a4ba">DEPARTURE</text>
+          <circle cx="380" cy="120" r="6" fill="#fbbf24"/><text x="380" y="144" fill="#93a4ba">EN-ROUTE ALTN</text>
+          <circle cx="640" cy="200" r="6" fill="#fbbf24"/><text x="640" y="224" fill="#93a4ba">DESTINATION</text>
+        </g>
+        <!-- ETOPS direct path -->
+        <path d="M120 200 L640 200" stroke="#34d399" stroke-width="3"/>
+        <text x="380" y="216" fill="#34d399" font-family="Sora" font-size="12" text-anchor="middle">ETOPS / EDTO path (ตรง)</text>
+        <!-- non-etops bent path -->
+        <path d="M120 200 Q250 70 380 120 Q510 70 640 200" fill="none" stroke="#38bdf8" stroke-width="2.4" stroke-dasharray="7 5"/>
+        <text x="380" y="56" fill="#38bdf8" font-family="Sora" font-size="12" text-anchor="middle">Non-ETOPS path (อ้อมให้อยู่ในวง)</text>
+      </svg>
+      <figcaption>Fig. 3 — R = ระยะที่บินได้ใน rated time ที่ OEI cruising speed; EDTO อนุมัติให้บินเส้นตรงโดยไม่ต้องอยู่ในวง threshold ตลอดเวลา</figcaption>
+    </figure>
+
+    <h3>Threshold time เทียบ Maximum diversion time</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Threshold time</h4>
+        <p class="muted">เส้นแบ่งว่า "เริ่มเป็น EDTO" — โดยทั่วไปในอุตสาหกรรมใช้ <strong>60 นาที</strong>
+          ถ้า diversion time เกินค่านี้ ต้องมีการอนุมัติ EDTO</p>
+      </div>
+      <div class="card">
+        <h4>Maximum diversion time</h4>
+        <p class="muted">เวลา diversion สูงสุดที่ได้รับอนุมัติ (เช่นในอุตสาหกรรม 120 / 180 นาที) เป็นตัวกำหนด
+          ขนาด "พื้นที่ปฏิบัติการ" และ en-route alternate ต้องอยู่ภายในเวลานี้ — ระดับที่อนุมัติจริงเป็นไปตาม OpSpec/Authority ของผู้ดำเนินการ</p>
+      </div>
+    </div>
+
+    <h3>ฝั่ง Dispatch: EDTO Critical Fuel</h3>
+    <p>เชื้อเพลิงที่ต้องมีคือค่าที่มากกว่าระหว่าง Standard Fuel Planning กับ <strong>EDTO Critical Fuel Scenario</strong>
+      ซึ่งนิยามว่า เชื้อเพลิงที่จำเป็นในการบินไป en-route alternate โดยพิจารณา <strong>ณ จุดวิกฤตที่สุดบนเส้นทาง</strong>
+      ภายใต้ <strong>system failure ที่จำกัดที่สุด</strong> (เช่น decompression แล้ว driftdown, หรือ engine-out)
+      โดยมี EDTO significant systems และ EEP (ETOPS Entry Point) เป็นองค์ประกอบที่ต้องติดตาม</p>
+
+    <h3>ข้อมูลจริงของฝูงบิน (Non-ETOPS, 60-min OEI)</h3>
+    <p class="muted">ระยะที่บินได้ใน 60 นาที ที่ OEI cruising speed สำหรับเครื่องที่ <strong>ไม่มี</strong> การอนุมัติ ETOPS (อ้างอิง OM-B):</p>
+    <div class="scroll-x">
+      <table class="tbl">
+        <thead><tr><th>Type</th><th>ระยะ 60 นาที (OEI)</th><th>OEI Cruising Speed</th></tr></thead>
+        <tbody>
+          <tr><td>B737-400 (B734)</td><td class="mono">404 NM</td><td class="mono">412 kt (M0.74 / 330 KIAS)</td></tr>
+          <tr><td>B737-800 (B738)</td><td class="mono">425 NM</td><td class="mono">432 kt (M0.79 / 330 KIAS)</td></tr>
+          <tr><td>B767-300 (B763)</td><td class="mono">440 NM</td><td class="mono">432 kt (M0.80 / 330 KIAS)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <span class="lbl">Extended Overwater</span>
+      สำหรับการบินเหนือน้ำ ห้ามอยู่ห่างจากแผ่นดินที่ลงฉุกเฉินได้ เกิน <strong>120 นาทีที่ cruising speed หรือ 400 NM แล้วแต่ค่าใดน้อยกว่า</strong>
+      สำหรับเครื่องที่บินต่อไปยังสนามบินได้เมื่อ critical power unit ขัดข้อง ณ จุดใด ๆ บนเส้นทางหรือ planned diversion
+    </div>
+  </section>
+
+  <!-- 4. WITHOUT ALTERNATE -->
+  <section id="noalt">
+    <div class="eyebrow"><span class="num">04</span> Planning without / with multiple Alternate</div>
+    <h2>เมื่อ Destination Alternate เปลี่ยนรูป</h2>
+    <p>การจัดการ alternate มีสามกรณีที่ต้องแยกให้ชัด ตัวกระตุ้น (trigger) ของแต่ละกรณี <strong>ดูที่สภาพของ Destination เป็นหลัก</strong>
+      ไม่ใช่ที่ alternate</p>
+
+    <h3>กรณี A — ต้องมี 2 Destination Alternate</h3>
+    <p>วางแบบนี้เมื่อ <strong>สภาพอากาศของ Destination</strong> ต่ำกว่า planning minima ในช่วง ±1 ชม. จาก ETA
+      <strong>หรือ ไม่มีข่าวอากาศของ Destination</strong> เชื้อเพลิง alternate ใช้ค่าของ alternate ที่ต้องการเชื้อเพลิงมากกว่า</p>
+    <div class="formula">
+      Min fuel (2 alternates) = Taxi <span class="plus">+</span> Trip <span class="plus">+</span> Contingency
+      <span class="plus">+</span> <span class="hl">Alternate (ตัวที่ใช้ fuel มากกว่า)</span>
+      <span class="plus">+</span> Final Reserve <span class="plus">+</span> Additional <span class="plus">+</span> Extra
+    </div>
+
+    <h3>กรณี B — ไม่มี Destination Alternate</h3>
+    <p>วางแผนแบบไม่มี alternate ได้เมื่อเข้าเกณฑ์ <strong>ครบทุกข้อ</strong> (OM-A 8.1.2.4.3 / 8.1.2.4.4):</p>
+    <ul class="clean">
+      <li>เวลาบิน takeoff → landing <strong>ไม่เกิน 6 ชม.</strong> (กรณี in-flight re-planning ใช้ remaining time ตามที่ OM กำหนด — ดูหมายเหตุ)</li>
+      <li>มี <strong>two separate runways</strong> ที่ใช้ได้ที่ destination (แต่ละ runway มี approach/navaid แยกกัน และเหตุการณ์เดียวต้องไม่ปิดทั้งคู่)</li>
+      <li>weather ในช่วง ±1 ชม. จาก ETA: <strong>ceiling ≥ 2,000 ft หรือ circling height + 500 ft</strong> (ค่าใดมากกว่า) <strong>และ ground visibility ≥ 5 km</strong></li>
+    </ul>
+    <p>แทนที่จะใส่ alternate fuel ให้ใส่เชื้อเพลิงสำหรับ <strong>holding 15 นาที ที่ 1,500 ft เหนือ destination</strong> (standard conditions)</p>
+
+    <figure>
+      <svg viewBox="0 0 760 200" role="img" aria-label="เกณฑ์ no destination alternate">
+        <rect x="0" y="0" width="760" height="200" fill="#0b1320"/>
+        <g font-family="IBM Plex Sans Thai" font-size="13" text-anchor="middle">
+          <rect x="30" y="60" width="150" height="80" rx="10" fill="#13202f" stroke="#38bdf8"/>
+          <text x="105" y="96" fill="#fff" font-size="14">≤ 6 ชม.</text>
+          <text x="105" y="118" fill="#93a4ba" font-size="11">เวลาบิน</text>
+          <text x="205" y="105" fill="#62748d" font-family="IBM Plex Mono" font-size="18">+</text>
+          <rect x="230" y="60" width="150" height="80" rx="10" fill="#13202f" stroke="#38bdf8"/>
+          <text x="305" y="96" fill="#fff" font-size="14">2 runways</text>
+          <text x="305" y="118" fill="#93a4ba" font-size="11">separate</text>
+          <text x="405" y="105" fill="#62748d" font-family="IBM Plex Mono" font-size="18">+</text>
+          <rect x="430" y="60" width="180" height="80" rx="10" fill="#13202f" stroke="#38bdf8"/>
+          <text x="520" y="92" fill="#fff" font-size="13">ceiling ≥ 2000 ft</text>
+          <text x="520" y="112" fill="#fff" font-size="13">vis ≥ 5 km</text>
+          <text x="635" y="105" fill="#34d399" font-family="IBM Plex Mono" font-size="22">→</text>
+          <rect x="660" y="64" width="78" height="72" rx="10" fill="#0f2a20" stroke="#34d399"/>
+          <text x="699" y="94" fill="#34d399" font-size="12">+15 min</text>
+          <text x="699" y="112" fill="#7ee0bd" font-size="11">hold</text>
+        </g>
+        <text x="380" y="34" fill="#fbbf24" font-family="Sora" font-size="13" text-anchor="middle">ต้องครบทุกเงื่อนไข (AND)</text>
+      </svg>
+      <figcaption>Fig. 4 — เกณฑ์ No Destination Alternate (pre-flight): ครบทุกข้อจึงแทน alternate fuel ด้วย holding 15 นาทีเหนือ destination</figcaption>
+    </figure>
+
+    <h3>กรณี C — Isolated Aerodrome</h3>
+    <p>สนามบินถือเป็น <strong>isolated</strong> เมื่อเชื้อเพลิง (diversion + final reserve) ไปยัง adequate alternate ที่ใกล้ที่สุด
+      <strong>มากกว่า</strong> เชื้อเพลิงสำหรับบิน 2 ชม. ที่ normal cruise consumption เหนือ destination รวม final reserve
+      กล่าวคือ ไม่มี alternate ที่คุ้มจะไป</p>
+    <p>กรณีนี้ <strong>Destination Alternate Fuel + Final Reserve ถูกแทน</strong> ด้วย (สำหรับเครื่อง turbine):</p>
+    <div class="formula">
+      <span class="hl">เชื้อเพลิงสำหรับบิน 2 ชม. ที่ normal cruise consumption</span> เหนือ destination
+      <span class="res">(รวม Final Reserve อยู่ในนี้แล้ว)</span>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 760 230" role="img" aria-label="isolated aerodrome">
+        <rect x="0" y="0" width="760" height="230" fill="#0b1320"/>
+        <line x1="40" y1="180" x2="720" y2="180" stroke="#26384f" stroke-width="1.4"/>
+        <!-- dep -->
+        <circle cx="120" cy="180" r="6" fill="#38bdf8"/>
+        <text x="120" y="202" fill="#93a4ba" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">DEPARTURE</text>
+        <!-- route -->
+        <path d="M120 180 L520 180" stroke="#38bdf8" stroke-width="3"/>
+        <!-- PNR -->
+        <circle cx="360" cy="180" r="5" fill="#f87171"/>
+        <text x="360" y="166" fill="#f87171" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">PNR</text>
+        <!-- isolated dest with 2h hold ring -->
+        <circle cx="560" cy="120" r="70" fill="none" stroke="#fbbf24" stroke-width="1.6" stroke-dasharray="5 5"/>
+        <circle cx="560" cy="180" r="6" fill="#fbbf24"/>
+        <text x="560" y="202" fill="#93a4ba" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">ISOLATED DEST</text>
+        <text x="560" y="64" fill="#fbbf24" font-family="IBM Plex Sans Thai" font-size="12" text-anchor="middle">holding 2 ชม.</text>
+        <text x="560" y="46" fill="#62748d" font-family="IBM Plex Mono" font-size="10" text-anchor="middle">normal cruise + final</text>
+        <text x="240" y="206" fill="#62748d" font-family="IBM Plex Sans Thai" font-size="11" text-anchor="middle">ห้ามบินเลย PNR หากยังไม่มั่นใจว่าลงปลายทางได้</text>
+      </svg>
+      <figcaption>Fig. 5 — Isolated aerodrome: ไม่มี alternate ที่คุ้ม จึงพก holding 2 ชม. เหนือปลายทาง และมีกฎ Point of No Return (PNR)</figcaption>
+    </figure>
+
+    <div class="note danger">
+      <span class="lbl">ข้อกำหนดเพิ่มเติม</span>
+      การบินไป isolated aerodrome <strong>ห้ามบินเลย PNR</strong> นอกจากการประเมินสภาพอากาศ/ traffic ล่าสุดบ่งชี้ว่า
+      ลงปลายทางได้อย่างปลอดภัย และต้องได้รับอนุมัติจาก CAAT ล่วงหน้า โดยรายชื่อสนามบินต้องอยู่ใน OM
+    </div>
+  </section>
+
+  <!-- WORKED EXAMPLES -->
+  <section id="examples">
+    <div class="eyebrow"><span class="num">05</span> Worked Examples</div>
+    <h2>ตัวอย่างคำนวณแบบมีตัวเลข</h2>
+    <div class="note warn">
+      <span class="lbl">หมายเหตุการสอน</span>
+      ตัวเลข trip / alternate ในตัวอย่างเป็น <strong>ตัวเลขสมมุติเพื่อการสอน</strong> ส่วนเปอร์เซ็นต์และค่ามาตรฐาน
+      (5% / 3% / final reserve / taxi) เป็นของจริงตาม FDM/OM-A
+    </div>
+
+    <h3>Example A — Standard Fuel Planning (B737-800)</h3>
+    <p class="muted">สมมุติ sector ระยะกลาง: Trip = 5,000 kg, มี destination alternate (alternate fuel = 1,200 kg), ไม่มี ERA</p>
+    <div class="formula">
+      Taxi <span class="muted">(มาตรฐาน B738)</span> = 200 kg<br>
+      Trip = 5,000 kg<br>
+      Contingency = สูงสุดของ { 5%×5000 = <span class="hl">250</span> ; 3%(ไม่มี ERA → ใช้ไม่ได้) ; 5-min hold ≈ 200 } = <span class="hl">250 kg</span><br>
+      Alternate = 1,200 kg<br>
+      Final Reserve <span class="muted">(B738)</span> = 1,200 kg<br>
+      <span class="rule"></span>
+      <span class="res">BLOCK / RAMP = 200 + 5,000 + 250 + 1,200 + 1,200 = 7,850 kg</span><br>
+      <span class="res">TAKE-OFF FUEL = Ramp − Taxi = 7,650 kg</span>
+    </div>
+
+    <h3>Example B — Contingency "เลือกค่าสูงสุด" (สั้น vs ยาว)</h3>
+    <p class="muted">ใช้ holding flow โดยประมาณของ B738 ≈ 200 kg / 5 นาที (ค่าจริงดู FPPM)</p>
+    <div class="grid2">
+      <div class="card">
+        <h4>Sector สั้น — Trip 1,500 kg</h4>
+        <div class="formula" style="margin:0">
+          5% = 75 kg<br>3% (ERA) = 45 kg<br>5-min hold ≈ <span class="hl">200 kg</span><br>
+          <span class="res">⇒ เลือก 200 kg (holding ชนะ)</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4>Sector ยาว — Trip 9,000 kg</h4>
+        <div class="formula" style="margin:0">
+          5% = <span class="hl">450 kg</span><br>3% (ERA) = 270 kg<br>5-min hold ≈ 200 kg<br>
+          <span class="res">⇒ ไม่มี ERA: 450 kg / มี ERA: 270 kg</span><br>
+          <span class="muted">ERA ช่วยประหยัด 180 kg</span>
+        </div>
+      </div>
+    </div>
+    <p class="muted">บทเรียน: เที่ยวสั้น holding-5-นาทีมักเป็นตัวกำหนด ส่วนเที่ยวยาวเปอร์เซ็นต์เป็นตัวกำหนด และ ERA มีค่าจริงเฉพาะเที่ยวยาว</p>
+
+    <h3>Example C — Re-clearance POR Check (B767-300)</h3>
+    <p class="muted">เปรียบเทียบการบรรทุก Contingency แบบตรง vs ผ่าน POR</p>
+    <div class="formula">
+      <span class="muted">// วางแผนตรง DEP→Final</span><br>
+      Trip (DEP→Final) = 18,000 kg → Contingency 5% = <span class="hl">900 kg</span><br><br>
+      <span class="muted">// วางแผนผ่าน POR (คิด Contingency เฉพาะช่วงหลัง POR)</span><br>
+      Trip (POR→Final) = 4,000 kg → Contingency 5% = <span class="hl">200 kg</span><br>
+      <span class="res">⇒ ประหยัด Contingency ≈ 700 kg → แปลงเป็น payload ได้</span>
+    </div>
+    <p class="muted"><strong>การตรวจสอบ ณ POR</strong> — Required-to-Final:</p>
+    <div class="formula">
+      Trip (POR→Final) 4,000 <span class="plus">+</span> 5% Contingency 200 <span class="plus">+</span>
+      Alternate (final) 1,800 <span class="plus">+</span> Final Reserve (B763) 1,700<br>
+      = <span class="hl">7,700 kg</span><br>
+      <span class="res">ถ้า EFOB overhead POR = 8,200 kg ≥ 7,700 → re-clear ไป Final</span><br>
+      ถ้า EFOB = 7,400 kg &lt; 7,700 → <span style="color:var(--red)">divert ไป Initial Destination</span>
+    </div>
+
+    <h3>Example D — EDTO Critical Fuel Scenario</h3>
+    <p class="muted">ณ จุดวิกฤต ระยะ diversion ไป en-route alternate ≈ 400 NM เปรียบเทียบเชื้อเพลิงที่ต้องใช้ในแต่ละกรณีความเสียหาย</p>
+    <div class="scroll-x">
+      <table class="tbl">
+        <thead><tr><th>กรณี (ที่จุดวิกฤต)</th><th>ลักษณะการบิน diversion</th><th>เชื้อเพลิง (สมมุติ)</th></tr></thead>
+        <tbody>
+          <tr><td>Normal (ทุกระบบปกติ)</td><td>cruise ปกติ</td><td class="mono">≈ 3,000 kg</td></tr>
+          <tr><td>One-engine inoperative</td><td>driftdown ระดับต่ำลง ช้าลง</td><td class="mono">≈ 3,800 kg</td></tr>
+          <tr><td>Decompression</td><td>descent ถึง ≈ FL100, fuel flow สูง</td><td class="mono">≈ 4,500 kg</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="formula">
+      EDTO Critical Fuel = <span class="hl">กรณีที่กินเชื้อเพลิงมากที่สุด</span> (≈ 4,500 kg)<br>
+      <span class="plus">+</span> ice protection allowance <span class="plus">+</span> holding 15 min @1,500 ft <span class="plus">+</span> approach &amp; landing
+      <span class="plus">+</span> wind/error margin<br>
+      <span class="res">⇒ เชื้อเพลิงที่บรรทุก = ค่าที่มากกว่า ระหว่าง Standard Plan กับ EDTO Critical Fuel</span>
+    </div>
+    <p class="muted">บทเรียน: critical fuel ไม่ได้คิดที่ "เครื่องยนต์เดียว" เสมอไป — decompression ที่ต้องลงระดับต่ำมักกินเชื้อเพลิงมากกว่า จึงเป็นตัวกำหนด</p>
+  </section>
+
+  <!-- IN-FLIGHT FUEL MANAGEMENT -->
+  <section id="inflight">
+    <div class="eyebrow"><span class="num">06</span> In-flight Fuel Management</div>
+    <h2>การจัดการเชื้อเพลิงระหว่างบินและการแจ้งสถานะ</h2>
+    <p>การวางแผนที่ดีไม่จบที่ release — ต้องมีการเฝ้าระวังระหว่างบิน เพราะ contingency คือเครื่องมือดูดซับ deviation
+      ส่วน <strong>Final Reserve คือเส้นแดงที่ต้องไม่แตะ</strong></p>
+
+    <h3>In-flight Fuel Checks &amp; Range Control</h3>
+    <ul class="clean">
+      <li>ตรวจเชื้อเพลิงเป็นระยะ บันทึก Time / Fuel Used (FU) / FOB / Fuel Flow (FF) แล้วเทียบ actual กับ planned</li>
+      <li>Range control อย่างน้อยทุก <strong>60 นาที</strong> — เทียบ fuel ที่เหลือจริงกับที่ประมาณการ เพื่อจับ leak หรือสิ้นเปลืองผิดปกติ</li>
+      <li>วิธีไขว้: (Block fuel ก่อน start) − FU เทียบกับ FOB ที่อ่านได้ ถ้าไม่ต่างมากให้ใช้ค่าที่อ่านจากเครื่อง</li>
+    </ul>
+
+    <h3>การแจ้งสถานะเชื้อเพลิง (FDM 4.5.6 / OM-A 8.3.7.3.3)</h3>
+    <figure>
+      <svg viewBox="0 0 760 210" role="img" aria-label="ระดับการแจ้งเชื้อเพลิง">
+        <rect x="0" y="0" width="760" height="210" fill="#0b1320"/>
+        <!-- ladder -->
+        <rect x="60" y="40" width="640" height="40" rx="8" fill="#13202f" stroke="#34d399"/>
+        <text x="80" y="65" fill="#34d399" font-family="Sora" font-size="14">ปกติ</text>
+        <text x="690" y="65" fill="#7ee0bd" font-family="IBM Plex Mono" font-size="11" text-anchor="end">&gt; planned final reserve</text>
+
+        <rect x="60" y="92" width="640" height="40" rx="8" fill="#1c1a0e" stroke="#fbbf24"/>
+        <text x="80" y="117" fill="#fbbf24" font-family="Sora" font-size="14">MINIMUM FUEL (advisory)</text>
+        <text x="690" y="117" fill="#fbbf24" font-family="IBM Plex Mono" font-size="10.5" text-anchor="end">committed แล้ว + การเปลี่ยน clearance อาจทำให้ &lt; final reserve</text>
+
+        <rect x="60" y="144" width="640" height="46" rx="8" fill="#23110f" stroke="#f87171"/>
+        <text x="80" y="172" fill="#f87171" font-family="Sora" font-size="14">MAYDAY MAYDAY MAYDAY FUEL</text>
+        <text x="690" y="166" fill="#f8a3a3" font-family="IBM Plex Mono" font-size="10.5" text-anchor="end">fuel ที่จะเหลือเมื่อลงสนามใกล้สุด</text>
+        <text x="690" y="180" fill="#f8a3a3" font-family="IBM Plex Mono" font-size="10.5" text-anchor="end">&lt; planned final reserve</text>
+      </svg>
+      <figcaption>Fig. 6 — สามระดับสถานะเชื้อเพลิง: Minimum Fuel เป็น advisory (ไม่ใช่ฉุกเฉิน ไม่ขอ priority) ส่วน MAYDAY FUEL คือการประกาศฉุกเฉิน</figcaption>
+    </figure>
+    <ul class="clean">
+      <li><strong>MINIMUM FUEL</strong> — แจ้ง ATC เมื่อ <em>committed</em> ลงสนามบินหนึ่งแล้ว และคำนวณว่าการเปลี่ยน clearance ใด ๆ อาจทำให้ลงด้วยเชื้อเพลิงน้อยกว่า planned final reserve เป็นเพียง advisory ไม่ใช่ฉุกเฉิน และไม่ได้หมายถึงการขอ traffic priority</li>
+      <li><strong>MAYDAY FUEL</strong> — ประกาศเมื่อคำนวณว่าเชื้อเพลิงที่จะเหลือเมื่อลงสนามบินที่ใกล้ที่สุดซึ่งลงได้ปลอดภัย <em>น้อยกว่า</em> planned final reserve พร้อมรายงานเชื้อเพลิงคงเหลือเป็นนาทีให้ ATC</li>
+    </ul>
+
+    <div class="note">
+      <span class="lbl">Diversion timing (FDM 4.5.7)</span>
+      ต้อง divert ให้เร็วพอที่จะถึง initial approach fix ของ alternate พร้อมเชื้อเพลิงสำหรับ approach &amp; landing <strong>บวก final reserve เป็นอย่างน้อย</strong>
+    </div>
+
+    <h3>Tankering (เชื้อเพลิงเชิงเศรษฐกิจ)</h3>
+    <p class="muted">นโยบายคือ tanker เมื่อส่วนต่างราคาคุ้ม โดย OFP จะคำนวณ benefit ให้ — ปริมาณที่แนะนำคือ <span class="k">OPT (Optimum)</span>
+      หากติด RTOW หรือ landing weight อาจบรรทุกได้เป็นเปอร์เซ็นต์ ทั้งนี้ tankering จัดเป็น Extra fuel เพิ่มได้แต่ห้ามลดขั้นต่ำตามกฎ</p>
+  </section>
+
+  <!-- SUMMARY -->
+  <section id="summary">
+    <div class="eyebrow"><span class="num">07</span> Quick Reference</div>
+    <h2>ตารางสรุปเทียบเร็ว</h2>
+    <div class="scroll-x">
+      <table class="tbl">
+        <thead><tr><th>หัวข้อ</th><th>ตัวเลขสำคัญ</th><th>เงื่อนไข / จุดเน้น</th></tr></thead>
+        <tbody>
+          <tr><td>Contingency 5%</td><td class="mono">5% trip fuel</td><td>ค่ามาตรฐาน เลือกร่วมกับ 3% และ 5-min แล้วเอาค่าสูงสุด</td></tr>
+          <tr><td>Contingency 3%</td><td class="mono">3% trip fuel</td><td>ใช้ได้เมื่อมี En-route Alternate ที่ใช้ได้จริงเท่านั้น</td></tr>
+          <tr><td>Contingency (เวลา)</td><td class="mono">5 min @1500ft</td><td>holding speed, ISA, เหนือ destination</td></tr>
+          <tr><td>Final Reserve</td><td class="mono">30 min @1500ft</td><td>เหนือสนามบินที่ลงจริง, ห้ามแตะ</td></tr>
+          <tr><td>Re-clearance</td><td class="mono">5% (POR→Final)</td><td>Contingency คิดเฉพาะช่วงหลัง POR; fallback = Initial Dest</td></tr>
+          <tr><td>EDTO threshold</td><td class="mono">~60 min</td><td>เกินนี้ = EDTO; max diversion time ตาม OpSpec</td></tr>
+          <tr><td>No alternate</td><td class="mono">≤6h + 15 min hold</td><td>2 separate runways + ceiling/vis ผ่านเกณฑ์ ±1h ETA</td></tr>
+          <tr><td>Isolated</td><td class="mono">2h normal cruise</td><td>แทน alternate+final; มี PNR + ต้องได้รับอนุมัติ</td></tr>
+          <tr><td>MINIMUM FUEL</td><td class="mono">advisory</td><td>committed แล้ว + เปลี่ยน clearance อาจทำให้ &lt; final reserve</td></tr>
+          <tr><td>MAYDAY FUEL</td><td class="mono">emergency</td><td>fuel ลงสนามใกล้สุด &lt; planned final reserve</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SELF CHECK -->
+  <section id="check">
+    <div class="eyebrow"><span class="num">08</span> Self-check</div>
+    <h2>ทบทวนความเข้าใจ</h2>
+    <p class="muted">ลองตอบในใจก่อนเปิดเฉลย</p>
+
+    <details class="q">
+      <summary><span class="qn">Q1</span> ทำไม Contingency จึงไม่ใช่ "เลือก 5% หรือ 3%" แต่ต้องคำนวณทั้งสามทาง?</summary>
+      <div class="ans">
+        <p>เพราะกฎกำหนดให้เลือก <strong>ค่าที่มากที่สุด</strong> ในสามทาง: 5% ของ trip fuel, 3% ของ trip fuel (เมื่อมี ERA),
+          และ fuel สำหรับ holding 5 นาทีที่ 1,500 ft เหนือ destination. ในเที่ยวบินสั้น ค่า 5-min holding อาจมากกว่าทั้ง 5% และ 3% ได้</p>
+      </div>
+    </details>
+
+    <details class="q">
+      <summary><span class="qn">Q2</span> เงื่อนไขเดียวที่ทำให้ลด Contingency จาก 5% เหลือ 3% ได้คืออะไร?</summary>
+      <div class="ans">
+        <p>ต้องมี <strong>En-route Alternate (ERA) ที่ใช้ได้จริง</strong> ตามเส้นทาง และค่าที่ได้ต้องไม่ต่ำกว่า minimum contingency ที่ผู้ดำเนินการกำหนด</p>
+      </div>
+    </details>
+
+    <details class="q">
+      <summary><span class="qn">Q3</span> Re-clearance ประหยัดเชื้อเพลิงได้อย่างไร?</summary>
+      <div class="ans">
+        <p>เพราะ Contingency ถูกคิดเฉพาะช่วง <strong>POR → Final Destination</strong> แทนที่จะคิดบนทั้งเส้นทาง
+          ทำให้ Contingency เล็กลง เหลือพื้นที่ให้ payload มากขึ้น โดยช่วง DEP→POR ต้องบรรทุกพอไปถึง Initial Destination พร้อม reserve เต็ม</p>
+      </div>
+    </details>
+
+    <details class="q">
+      <summary><span class="qn">Q4</span> ถ้า fuel ณ POR ไม่พอจะ re-clear เครื่องต้องไปไหน?</summary>
+      <div class="ans">
+        <p>ต้อง divert ไป <strong>Initial Destination</strong> (สนามบินที่ใกล้กว่า ซึ่งเป็น secondary ของแผน) ไม่ใช่ destination alternate
+          เว้นแต่เข้าเกณฑ์ replanning without alternate ครบ</p>
+      </div>
+    </details>
+
+    <details class="q">
+      <summary><span class="qn">Q5</span> R ในแผนภาพ ETOPS หมายถึงอะไร?</summary>
+      <div class="ans">
+        <p>รัศมี = ระยะที่บินได้ภายในเวลาที่อนุมัติ (rated/threshold time) ที่ <strong>One-Engine-Inoperative (OEI) cruising speed ใน still air</strong>
+          en-route alternate ต้องอยู่ภายในวงที่กำหนดด้วย maximum diversion time</p>
+      </div>
+    </details>
+
+    <details class="q">
+      <summary><span class="qn">Q6</span> วางแผนไม่มี Destination Alternate ต้องเข้าเกณฑ์อะไรบ้าง และทดแทนด้วยอะไร?</summary>
+      <div class="ans">
+        <p>ครบทั้งหมด: เวลาบิน ≤ 6 ชม., มี 2 separate runways ที่ destination, และ weather ±1 ชม. จาก ETA มี ceiling ≥ 2,000 ft
+          หรือ circling height + 500 ft (ค่าใดมากกว่า) และ vis ≥ 5 km. แทน alternate fuel ด้วย <strong>holding 15 นาทีที่ 1,500 ft เหนือ destination</strong></p>
+      </div>
+    </details>
+
+    <details class="q">
+      <summary><span class="qn">Q7</span> Isolated aerodrome ต่างจาก No-alternate ทั่วไปอย่างไรในเรื่องเชื้อเพลิง?</summary>
+      <div class="ans">
+        <p>Isolated ใช้เมื่อไม่มี alternate ที่คุ้มจะไป โดยแทน alternate fuel + final reserve ด้วยเชื้อเพลิงบิน
+          <strong>2 ชม. ที่ normal cruise consumption</strong> เหนือปลายทาง (รวม final reserve) — ใช้ <em>normal cruise</em> ไม่ใช่ holding consumption
+          และมีกฎ Point of No Return เพิ่มเติม</p>
+      </div>
+    </details>
+    <details class="q">
+      <summary><span class="qn">Q8</span> EFOB overhead POR = 7,400 kg แต่ required-to-Final = 7,700 kg ต้องทำอย่างไร?</summary>
+      <div class="ans">
+        <p>เชื้อเพลิงไม่ถึงเกณฑ์ (7,400 &lt; 7,700) จึง <strong>re-clear ไป Final Destination ไม่ได้</strong> ต้อง divert ไป
+          <strong>Initial Destination</strong> เว้นแต่เข้าเกณฑ์ replanning without alternate ครบ</p>
+      </div>
+    </details>
+
+    <details class="q">
+      <summary><span class="qn">Q9</span> "MINIMUM FUEL" ต่างจาก "MAYDAY FUEL" อย่างไร?</summary>
+      <div class="ans">
+        <p><strong>MINIMUM FUEL</strong> เป็น advisory: committed ลงสนามแล้ว และการเปลี่ยน clearance อาจทำให้ลงต่ำกว่า planned final reserve
+          — ไม่ใช่ฉุกเฉิน ไม่ได้ขอ priority. <strong>MAYDAY FUEL</strong> เป็นการประกาศฉุกเฉิน: คาดว่าเชื้อเพลิงเมื่อลงสนามใกล้สุดจะ
+          <em>น้อยกว่า</em> final reserve</p>
+      </div>
+    </details>
+
+    <details class="q">
+      <summary><span class="qn">Q10</span> Final Reserve ของ B767-300 ตามค่ามาตรฐานคือเท่าใด และคิดที่ไหน?</summary>
+      <div class="ans">
+        <p>ค่าอ้างอิง <strong>1,700 kg</strong> (≈ holding 30 นาทีที่ 1,500 ft) คิดที่น้ำหนักประมาณการเมื่อถึง
+          <strong>สนามบินที่ลงจริง</strong> (alternate หรือ destination เมื่อไม่ต้องมี alternate)</p>
+      </div>
+    </details>
+  </section>
+
+</main>
+
+<footer>
+  <p class="mono">SOURCES — Flight Dispatcher Manual (Sec. 3.9, 4.5) · OM-A (Sec. 8) · OM-B · All Weather Operations Manual · ICAO Annex 6 Part I</p>
+  <p>เอกสารนี้จัดทำเพื่อการ <strong>ทบทวนความรู้และการฝึกอบรม</strong> เท่านั้น ตัวเลขบางส่วน (เช่น ระดับการอนุมัติ EDTO และ remaining-time
+    กรณี in-flight re-planning) ขึ้นกับ OpSpec/Authority และอาจต่างกันตามฉบับของ OM — การปฏิบัติการจริงให้ยึด controlled OM ฉบับล่าสุดเสมอ
+    (UNCONTROLLED WHEN PRINTED)</p>
+</footer>
+
+<script>
+  // active-section highlight on nav (no inline handlers; element captured per-iteration)
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
+    var map = {};
+    links.forEach(function (a) {
+      var id = a.getAttribute('href').slice(1);
+      var sec = document.getElementById(id);
+      if (sec) map[id] = a;
+    });
+    var sections = Object.keys(map).map(function (id) { return document.getElementById(id); });
+    if (!('IntersectionObserver' in window)) return;
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          var active = map[e.target.id];
+          if (active) {
+            active.classList.add('active');
+            active.scrollIntoView({ block: 'nearest', inline: 'center' });
+          }
+        }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    sections.forEach(function (s) { obs.observe(s); });
+  })();
+</script>
+</body>
+</html>
