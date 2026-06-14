@@ -1,5 +1,5 @@
 /* Fuel Planning Reference — offline service worker */
-const CACHE = 'fuel-planning-v1';
+const CACHE = 'fuel-planning-v2';
 const ASSETS = [
   './',
   './index.html',
